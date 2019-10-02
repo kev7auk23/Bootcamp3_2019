@@ -42,7 +42,7 @@ exports.create = function(req, res) {
       res.status(400).send(err);
     } else {
       res.json(listing);
-      console.log(listing)
+      console.log(listing);
     }
   });
 };
@@ -56,7 +56,7 @@ exports.read = function(req, res) {
 /* Update a listing - note the order in which this function is called by the router*/
 exports.update = function(req, res) {
   var listing = req.listing;
-  console.log('running exports.update')
+  if (!listing) return res.status(404).send('The listing with the given ID was not found.');
   /* Replace the listings's properties with the new properties found in req.body */
   if(req.body.name) {
     listing.name = req.body.name;
@@ -68,10 +68,7 @@ exports.update = function(req, res) {
     listing.code = req.body.code;
   }
   /*save the coordinates (located in req.results if there is an address property) */
-  console.log('req.results = ');
-  console.log(req.results);
   if(req.results) {
-    console.log('updating coordinates')
     listing.coordinates = {
       latitude: req.results.lat,
       longitude: req.results.lng
@@ -84,7 +81,7 @@ exports.update = function(req, res) {
       res.status(400).send(err);
     } else {
       res.json(listing);
-      console.log(listing)
+      console.log(listing);
     }
   });
 };
@@ -92,10 +89,11 @@ exports.update = function(req, res) {
 /* Delete a listing */
 exports.delete = function(req, res) {
   var listing = req.listing;
+  if (!listing) return res.status(404).send('The listing with the given ID was not found.');
   /* Add your code to remove the listings */
-  Listing.findOneAndDelete(listing.code, function(err, data) {
+  Listing.findOneAndDelete({"code":listing.code}, function(err, data) {
     if (err) throw err;
-    res.json(listing);
+    res.json(data);
     console.log(listing.code + ' removed from database.');
   });
 };
